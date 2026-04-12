@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Users,
@@ -55,21 +55,24 @@ const VALID_TABS: AdminTab[] = [
   "admins",
 ];
 
+function getTabFromPath(pathname: string): AdminTab {
+  const segment = pathname.split("/").pop() || "";
+  if (VALID_TABS.includes(segment as AdminTab)) {
+    return segment as AdminTab;
+  }
+  return "dashboard";
+}
+
 export function AdminPage() {
-  const { tab } = useParams<{ tab?: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
   const { logout, admin } = useAdminAuth();
 
   const isSuperAdmin = admin?.role === "SUPER_ADMIN";
 
-  const getInitialTab = (): AdminTab => {
-    if (tab && VALID_TABS.includes(tab as AdminTab)) {
-      return tab as AdminTab;
-    }
-    return "dashboard";
-  };
-
-  const [activeTab, setActiveTabState] = useState<AdminTab>(getInitialTab);
+  const [activeTab, setActiveTabState] = useState<AdminTab>(
+    getTabFromPath(location.pathname),
+  );
   const setActiveTab = useCallback(
     (newTab: AdminTab) => {
       setActiveTabState(newTab);
