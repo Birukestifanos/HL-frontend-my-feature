@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -46,6 +46,7 @@ import { AdminsTab } from "./tabs/AdminsTab";
 // Modals
 import { BeneficiaryModal } from "./components/modals/BeneficiaryModal";
 import { NewsModal } from "./components/modals/NewsModal";
+import { EmergencyModal } from "./components/modals/EmergencyModal";
 import { ContactDetailModal } from "./components/modals/ContactDetailModal";
 import { TransparencyModal } from "./components/modals/TransparencyModal";
 import { AdminManagementModal } from "../../components/admin/modals/AdminManagementModal";
@@ -69,14 +70,18 @@ export function AdminPage() {
 
   const isSuperAdmin = admin?.role === "SUPER_ADMIN";
 
-  const getInitialTab = (): AdminTab => {
-    if (tab && VALID_TABS.includes(tab as AdminTab)) {
-      return tab as AdminTab;
-    }
-    return "dashboard";
-  };
+  const [activeTab, setActiveTabState] = useState<AdminTab>(
+    tab && VALID_TABS.includes(tab as AdminTab)
+      ? (tab as AdminTab)
+      : "dashboard",
+  );
 
-  const [activeTab, setActiveTabState] = useState<AdminTab>(getInitialTab);
+  useEffect(() => {
+    if (tab && VALID_TABS.includes(tab as AdminTab)) {
+      setActiveTabState(tab as AdminTab);
+    }
+  }, [tab]);
+
   const setActiveTab = useCallback(
     (newTab: AdminTab) => {
       setActiveTabState(newTab);
@@ -131,7 +136,7 @@ export function AdminPage() {
   const [showTransparencyModal, setShowTransparencyModal] = useState(false);
   const adminModal = useCRUDModalState<Admin>();
 
-  // Emergency modal state
+  const [showEmergencyModal, setShowEmergencyModal] = useState(false);
   const [editingEmergency, setEditingEmergency] = useState<Emergency | null>(
     null,
   );
@@ -166,10 +171,9 @@ export function AdminPage() {
     setShowNewsModal(true);
   };
 
-  // Emergency modal helpers
   const openEmergencyModal = (item?: Emergency) => {
     setEditingEmergency(item || null);
-    setShowNewsModal(true);
+    setShowEmergencyModal(true);
   };
 
   // Admin table columns
@@ -367,13 +371,23 @@ export function AdminPage() {
       />
 
       <NewsModal
-        isOpen={showNewsModal && !editingEmergency}
+        isOpen={showNewsModal}
         onClose={() => {
           setShowNewsModal(false);
           setEditingNews(null);
         }}
         onSave={actions.handleNewsSave}
         editingNews={editingNews}
+      />
+
+      <EmergencyModal
+        isOpen={showEmergencyModal}
+        onClose={() => {
+          setShowEmergencyModal(false);
+          setEditingEmergency(null);
+        }}
+        onSave={actions.handleEmergencySave}
+        editingEmergency={editingEmergency}
       />
 
       <ContactDetailModal
