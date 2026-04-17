@@ -1,10 +1,13 @@
 import { Plus } from "lucide-react";
 import { AdminTable, Column } from "../../../components/admin/AdminTable";
 import type { Admin } from "../types/admin";
+import { TabError } from "../../../components/admin/TabError";
 
 interface AdminsTabProps {
   admins: Admin[];
   loadingData: boolean;
+  error: string | null;
+  onRetry: () => void;
   onAdd: () => void;
   columns: Column<Admin>[];
   onRowClick: (item: Admin) => void;
@@ -13,10 +16,27 @@ interface AdminsTabProps {
 export function AdminsTab({
   admins,
   loadingData,
+  error,
+  onRetry,
   onAdd,
   columns,
   onRowClick,
 }: AdminsTabProps) {
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="font-serif text-3xl font-bold text-gray-900 dark:text-white">
+            Admin Management
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Manage admin accounts (Super Admin only)
+          </p>
+        </div>
+        <TabError message={error} onRetry={onRetry} />
+      </div>
+    );
+  }
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

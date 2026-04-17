@@ -1,9 +1,12 @@
 import { FileText, Upload, Eye, Trash2, Loader2 } from "lucide-react";
 import type { TransparencyDoc } from "../types/admin";
+import { TabError } from "../../../components/admin/TabError";
 
 interface TransparencyTabProps {
   docs: TransparencyDoc[];
   loadingData: boolean;
+  error: string | null;
+  onRetry: () => void;
   onUpload: () => void;
   onDelete: (id: number) => void;
 }
@@ -11,9 +14,26 @@ interface TransparencyTabProps {
 export function TransparencyTab({
   docs,
   loadingData,
+  error,
+  onRetry,
   onUpload,
   onDelete,
 }: TransparencyTabProps) {
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="font-serif text-3xl font-bold text-gray-900 dark:text-white">
+            Transparency Files
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Upload and manage transparency documents
+          </p>
+        </div>
+        <TabError message={error} onRetry={onRetry} />
+      </div>
+    );
+  }
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

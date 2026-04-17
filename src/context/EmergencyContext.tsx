@@ -37,7 +37,7 @@ export function EmergencyProvider({ children }: { children: React.ReactNode }) {
     setError(null);
     try {
       const res = await emergencyAPI.getAll();
-      setEmergencies(res.data);
+      setEmergencies(res.data.emergencies);
     } catch (e: any) {
       setError(e.response?.data?.message || "Failed to fetch emergencies");
     } finally {
@@ -50,7 +50,7 @@ export function EmergencyProvider({ children }: { children: React.ReactNode }) {
     setError(null);
     try {
       const res = await emergencyAPI.getActive();
-      setActiveEmergencies(res.data);
+      setActiveEmergencies(res.data.emergencies);
     } catch (e: any) {
       setError(
         e.response?.data?.message || "Failed to fetch active emergencies",

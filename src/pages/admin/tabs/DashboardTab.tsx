@@ -16,6 +16,7 @@ import type {
   News,
   Emergency,
 } from "../types/admin";
+import { TabError } from "../../../components/admin/TabError";
 
 interface DashboardTabProps {
   admin: { email: string; role: string } | null;
@@ -24,6 +25,8 @@ interface DashboardTabProps {
   emergencies: Emergency[];
   donationStats: DonationStats | null;
   onNavigate: (tab: AdminTab) => void;
+  error: string | null;
+  onRetry: () => void;
 }
 
 export function DashboardTab({
@@ -33,7 +36,25 @@ export function DashboardTab({
   emergencies,
   donationStats,
   onNavigate,
+  error,
+  onRetry,
 }: DashboardTabProps) {
+  if (error) {
+    return (
+      <div className="space-y-8">
+        <div className="bg-gradient-to-r from-[#B91C1C] to-[#991B1B] rounded-3xl p-8 text-white">
+          <h1 className="font-serif text-3xl font-bold mb-2">
+            Welcome back, {admin?.email?.split("@")[0] || "Admin"}!
+          </h1>
+          <p className="text-white/80">
+            Here's what's happening with your organization today.
+          </p>
+        </div>
+        <TabError message={error} onRetry={onRetry} />
+      </div>
+    );
+  }
+
   const stats = [
     {
       label: "Total Beneficiaries",

@@ -1,18 +1,39 @@
 import { DollarSign, Users, BarChart3 } from "lucide-react";
 import { AdminTable } from "../../../components/admin/AdminTable";
 import type { Donation, DonationStats } from "../types/admin";
+import { TabError } from "../../../components/admin/TabError";
 
 interface DonationsTabProps {
   donations: Donation[];
   donationStats: DonationStats | null;
   loadingData: boolean;
+  error: string | null;
+  onRetry: () => void;
 }
 
 export function DonationsTab({
   donations,
   donationStats,
   loadingData,
+  error,
+  onRetry,
 }: DonationsTabProps) {
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="font-serif text-3xl font-bold text-[#15803d] dark:text-white">
+            Donations Management
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Track and manage all donation records
+          </p>
+        </div>
+        <TabError message={error} onRetry={onRetry} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

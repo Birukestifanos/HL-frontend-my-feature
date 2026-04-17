@@ -26,7 +26,7 @@ export function NewsProvider({ children }: { children: React.ReactNode }) {
     setError(null);
     try {
       const res = await newsAPI.getAll();
-      setNews(res.data);
+      setNews(res.data.news);
     } catch (e: any) {
       setError(e.response?.data?.message || "Failed to fetch news");
     } finally {

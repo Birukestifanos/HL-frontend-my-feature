@@ -11,7 +11,7 @@ import type {
   Donation,
   DonationStats,
 } from "../types/admin";
-  
+
 export interface AdminData {
   contacts: Contact[];
   news: News[];
@@ -22,8 +22,9 @@ export interface AdminData {
   donations: Donation[];
   donationStats: DonationStats | null;
   loadingData: boolean;
+  error: string | null;
 }
-  
+
 export interface RefetchFunctions {
   refetchContacts: () => Promise<void>;
   refetchNews: () => Promise<void>;
@@ -32,8 +33,9 @@ export interface RefetchFunctions {
   refetchAdmins: () => Promise<void>;
   refetchBeneficiaryStats: () => Promise<void>;
   refetchDonations: () => Promise<void>;
+  retry: () => void;
 }
-  
+
 export function useAdminData(
   activeTab: AdminTab,
   isSuperAdmin: boolean,
@@ -52,37 +54,39 @@ export function useAdminData(
     null,
   );
   const [loadingData, setLoadingData] = useState(false);
-  
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+
   const refetchContacts = useCallback(async () => {
     const res = await apiClient.get("/v1/admin/contacts");
     setContacts(res.data.data);
   }, []);
-  
+
   const refetchNews = useCallback(async () => {
     const res = await apiClient.get("/v1/admin/news");
     setNews(res.data.data);
   }, []);
-  
+
   const refetchEmergencies = useCallback(async () => {
     const res = await apiClient.get("/v1/admin/emergencies");
     setEmergencies(res.data.data);
   }, []);
-  
+
   const refetchTransparency = useCallback(async () => {
     const res = await apiClient.get("/v1/admin/transparency");
     setTransparencyDocs(res.data.data);
   }, []);
-  
+
   const refetchAdmins = useCallback(async () => {
     const res = await apiClient.get("/v1/admin");
     setAdmins(res.data.data);
   }, []);
-  
+
   const refetchBeneficiaryStats = useCallback(async () => {
     const res = await apiClient.get("/v1/admin/beneficiary-stats");
     setBeneficiaryStats(res.data.data);
   }, []);
-  
+
   const refetchDonations = useCallback(async () => {
     const [donationsRes, donationStatsRes] = await Promise.all([
       apiClient.get("/v1/admin/donations"),
@@ -91,10 +95,15 @@ export function useAdminData(
     setDonations(donationsRes.data.data);
     setDonationStats(donationStatsRes.data.data);
   }, []);
-  
+
+  const retry = useCallback(() => {
+    setRetryCount((c) => c + 1);
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoadingData(true);
+      setError(null);
       try {
         switch (activeTab) {
           case "contacts":
@@ -118,8 +127,17 @@ export function useAdminData(
             await refetchDonations();
             break;
         }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+      } catch (err: unknown) {
+        const axiosErr = err as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
+        const message =
+          axiosErr.response?.data?.message ||
+          axiosErr.message ||
+          "Failed to load data. Please check your connection and try again.";
+        setError(message);
+        console.error("Error fetching data:", err);
       } finally {
         setLoadingData(false);
       }
@@ -128,6 +146,7 @@ export function useAdminData(
   }, [
     activeTab,
     isSuperAdmin,
+    retryCount,
     refetchContacts,
     refetchNews,
     refetchEmergencies,
@@ -136,7 +155,7 @@ export function useAdminData(
     refetchBeneficiaryStats,
     refetchDonations,
   ]);
-  
+
   return {
     contacts,
     news,
@@ -147,6 +166,7 @@ export function useAdminData(
     donations,
     donationStats,
     loadingData,
+    error,
     refetchContacts,
     refetchNews,
     refetchEmergencies,
@@ -154,5 +174,6 @@ export function useAdminData(
     refetchAdmins,
     refetchBeneficiaryStats,
     refetchDonations,
+    retry,
   };
 }

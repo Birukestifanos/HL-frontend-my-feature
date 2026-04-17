@@ -1,17 +1,38 @@
 import { Edit, Loader2 } from "lucide-react";
 import type { BeneficiaryStats } from "../types/admin";
+import { TabError } from "../../../components/admin/TabError";
 
 interface BeneficiariesTabProps {
   stats: BeneficiaryStats | null;
   loadingData: boolean;
   onEdit: () => void;
+  error: string | null;
+  onRetry: () => void;
 }
 
 export function BeneficiariesTab({
   stats,
   loadingData,
   onEdit,
+  error,
+  onRetry,
 }: BeneficiariesTabProps) {
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="font-serif text-3xl font-bold text-gray-900 dark:text-white">
+            Beneficiaries Management
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Manage and track all beneficiaries
+          </p>
+        </div>
+        <TabError message={error} onRetry={onRetry} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

@@ -10,7 +10,11 @@ export function EmergenciesPage() {
   const { activeEmergencies, loading, error, fetchActive } = useEmergency();
 
   useEffect(() => {
-    fetchActive();
+    const loadActiveEmergencies = async () => {
+      await fetchActive();
+    };
+
+    void loadActiveEmergencies();
   }, [fetchActive]);
 
   return (

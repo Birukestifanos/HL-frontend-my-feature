@@ -6,18 +6,38 @@ import {
   Loader2,
 } from "lucide-react";
 import type { Contact } from "../types/admin";
+import { TabError } from "../../../components/admin/TabError";
 
 interface ContactsTabProps {
   contacts: Contact[];
   loadingData: boolean;
+  error: string | null;
+  onRetry: () => void;
   onView: (contact: Contact) => void;
 }
 
 export function ContactsTab({
   contacts,
   loadingData,
+  error,
+  onRetry,
   onView,
 }: ContactsTabProps) {
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="font-serif text-3xl font-bold text-gray-900 dark:text-white">
+            Contacts & Inquiries
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Manage contact form submissions and inquiries
+          </p>
+        </div>
+        <TabError message={error} onRetry={onRetry} />
+      </div>
+    );
+  }
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

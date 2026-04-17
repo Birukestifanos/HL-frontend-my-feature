@@ -15,12 +15,15 @@ import { NewsModal } from "../components/modals/NewsModal";
 import { EmergencyModal } from "../components/modals/EmergencyModal";
 import type { News } from "../../../services/api/newsApi";
 import type { Emergency } from "../../../services/api/emergencyApi";
+import { TabError } from "../../../components/admin/TabError";
 
 interface NewsTabProps {
   searchQuery?: string;
+  error: string | null;
+  onRetry: () => void;
 }
 
-export function NewsTab({ searchQuery = "" }: NewsTabProps) {
+export function NewsTab({ searchQuery = "", error, onRetry }: NewsTabProps) {
   const {
     news,
     loading: newsLoading,
@@ -153,6 +156,24 @@ export function NewsTab({ searchQuery = "" }: NewsTabProps) {
       );
     }
   };
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-serif text-3xl font-bold text-gray-900 dark:text-white">
+              News & Emergencies
+            </h1>
+            <p className="text-gray-500 mt-1">
+              Manage news articles and emergency updates
+            </p>
+          </div>
+        </div>
+        <TabError message={error} onRetry={onRetry} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

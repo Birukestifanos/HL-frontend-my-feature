@@ -129,7 +129,12 @@ export function App() {
               <EmergencyProvider>
                 <NewsProvider>
                   <ContactProvider>
-                    <Router>
+                    <Router
+                      future={{
+                        v7_startTransition: true,
+                        v7_relativeSplatPath: true,
+                      }}
+                    >
                       <ScrollToTop />
                       <NavbarWrapper />
                       <div className="flex flex-col min-h-screen bg-[#F9F9F9] dark:bg-[#0f0f0f] font-sans text-[#1a1a1a] dark:text-[#f0f0f0] transition-colors duration-300">
